@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>𝐌𝐃_𝐌𝐀𝐌𝐔𝐍_(𝐎𝐰𝐧𝐞𝐫)</title>
+    <style>
+        /* === base reset === */
+        body, html { 
+            margin: 0; padding: 0; 
+            width: 100%; height: 100%; 
+            overflow: hidden; 
+            background-color: #000; 
+            font-family: 'Consolas', monospace; 
+        }
+        #game-frame { 
+            width: 100%; 
+            height: 100vh; 
+            border: none; 
+        }
+
+        /* === perfect rectangular RGB box – balanced size === */
+        #signal-box {
+            position: absolute; 
+            top: 12%; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 200px;           /* slight extra width for comfort */
+            background: #000;
+            border-radius: 12px;
+            color: #fff; 
+            z-index: 9999; 
+            cursor: move; 
+            padding: 14px 12px;    
+            text-align: center; 
+            user-select: none;
+            touch-action: none;
+            overflow: hidden;
+            
+            border: 2px solid #ff0000;
+            animation: rgb-border 3s linear infinite, colorful-glow 2s ease-in-out infinite;
+        }
+
+        /* RGB Border */
+        @keyframes rgb-border {
+            0% { border-color: #ff0000; }
+            17% { border-color: #ff8800; }
+            33% { border-color: #ffff00; }
+            50% { border-color: #00ff00; }
+            67% { border-color: #0088ff; }
+            83% { border-color: #0000ff; }
+            100% { border-color: #ff00ff; }
+        }
+
+        /* Colorful Glow */
+        @keyframes colorful-glow {
+            0% { box-shadow: 0 0 12px #ff0000, 0 0 25px #ff0000; }
+            20% { box-shadow: 0 0 12px #ff8800, 0 0 25px #ff8800; }
+            40% { box-shadow: 0 0 12px #ffff00, 0 0 25px #ffff00; }
+            60% { box-shadow: 0 0 12px #00ff00, 0 0 25px #00ff00; }
+            80% { box-shadow: 0 0 12px #0000ff, 0 0 25px #0000ff; }
+            100% { box-shadow: 0 0 12px #ff00ff, 0 0 25px #ff00ff; }
+        }
+
+        /* scan line */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #00ff00;
+            box-shadow: 0 0 20px 2px #00ff00;
+            z-index: 10000;
+            pointer-events: none;
+            animation: scan-move 2s linear infinite;
+        }
+        @keyframes scan-move {
+            0% { top: -5%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 105%; opacity: 0; }
+        }
+
+        /* --- profile images: BIGGER (38px) as requested --- */
+        .header-with-profile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;              
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+        }
+        
+        .profile-small {
+            width: 38px;            /* noticeably bigger */
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            object-fit: cover;
+            animation: profile-border 2s linear infinite;
+        }
+        
+        @keyframes profile-border {
+            0% { border-color: #ff0000; box-shadow: 0 0 12px #ff0000; }
+            33% { border-color: #00ff00; box-shadow: 0 0 12px #00ff00; }
+            66% { border-color: #0000ff; box-shadow: 0 0 12px #0000ff; }
+            100% { border-color: #ff0000; box-shadow: 0 0 12px #ff0000; }
+        }
+
+        .header-text { 
+            font-weight: 900; 
+            font-size: 11px;          
+            letter-spacing: 0.5px; 
+            color: #fff; 
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        /* login section */
+        #login-section input {
+            width: 92%; 
+            padding: 8px 5px; 
+            margin-bottom: 10px; 
+            background: #111; 
+            border: 1px solid #444; 
+            color: #fff; 
+            text-align: center; 
+            border-radius: 6px; 
+            outline: none; 
+            font-size: 11px;
+        }
+        .login-btn { 
+            background: linear-gradient(45deg, #00ff00, #00ffff);
+            color: #000; 
+            border: none; 
+            padding: 9px 5px; 
+            cursor: pointer; 
+            font-weight: 900; 
+            width: 100%; 
+            border-radius: 6px; 
+            font-size: 10px;
+            text-transform: uppercase;
+            animation: login-glow 2s ease-in-out infinite;
+            margin-bottom: 8px;    /* space before telegram link */
+        }
+        @keyframes login-glow {
+            0% { box-shadow: 0 0 12px #00ff00; }
+            50% { box-shadow: 0 0 22px #00ffff; }
+            100% { box-shadow: 0 0 12px #00ff00; }
+        }
+
+        /* --- telegram username link (under login button) --- */
+        .telegram-login-link {
+            display: block;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            padding: 6px 5px;
+            background: rgba(0, 100, 200, 0.2);
+            border-radius: 20px;
+            border: 1px solid #0088cc;
+            font-size: 11px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #0088cc;
+            transition: 0.3s;
+            animation: telegram-pulse 2s infinite;
+        }
+        .telegram-login-link:hover {
+            background: #0088cc;
+            color: #000;
+            border-color: #fff;
+        }
+        @keyframes telegram-pulse {
+            0% { box-shadow: 0 0 5px #0088cc; }
+            50% { box-shadow: 0 0 15px #0088cc; }
+            100% { box-shadow: 0 0 5px #0088cc; }
+        }
+
+        /* prediction container */
+        #hack-content { 
+            display: none; 
+        }
+
+        .res-container { 
+            background: rgba(0, 0, 0, 0.8); 
+            border: 1px solid rgba(255,255,255,0.2); 
+            padding: 10px 8px; 
+            border-radius: 8px; 
+            margin-bottom: 10px;
+            animation: container-glow 3s linear infinite;
+        }
+        @keyframes container-glow {
+            0% { border-color: #ff0000; box-shadow: inset 0 0 12px #ff0000; }
+            33% { border-color: #00ff00; box-shadow: inset 0 0 12px #00ff00; }
+            66% { border-color: #0000ff; box-shadow: inset 0 0 12px #0000ff; }
+            100% { border-color: #ff0000; box-shadow: inset 0 0 12px #ff0000; }
+        }
+
+        .label { 
+            font-size: 9px; 
+            color: #ffff00; 
+            text-transform: uppercase; 
+            margin-bottom: 4px; 
+        }
+        .value { 
+            font-size: 24px;          /* bold result */
+            font-weight: 900; 
+            line-height: 1.2; 
+            margin: 5px 0; 
+        }
+        .lucky-nums {
+            font-size: 13px; 
+            font-weight: bold; 
+            color: #00ff00;
+        }
+
+        .timer { 
+            font-size: 10px; 
+            color: #fff; 
+            margin-bottom: 8px; 
+        }
+        #seconds { 
+            color: #ff0000; 
+            font-weight: bold; 
+            animation: timer-blink 1s infinite;
+        }
+        @keyframes timer-blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* group button */
+        .add-btn {
+            display: block; 
+            padding: 8px 5px;
+            background: linear-gradient(45deg, #ff0000, #ff00ff);
+            color: #fff;
+            text-decoration: none; 
+            font-size: 10px; 
+            font-weight: 900;
+            border-radius: 6px; 
+            text-transform: uppercase;
+            animation: btn-glow 1.5s ease-in-out infinite;
+            margin-top: 8px;
+            margin-bottom: 2px;
+        }
+        @keyframes btn-glow {
+            0% { box-shadow: 0 0 12px #ff0000; }
+            50% { box-shadow: 0 0 22px #ff00ff; }
+            100% { box-shadow: 0 0 12px #ff0000; }
+        }
+
+        /* hide any leftover generic telegram class (only our new one visible) */
+        .telegram-username, .login-footer {
+            display: none;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+    <!-- iframe unchanged -->
+    <iframe id="game-frame" src="https://tkclub2.com/#/register?invitationCode=31542233685"><script>
+(function(){
+var _0x5f21="aHR0cHM6Ly90a2NsdWIyLmNvbS8jL2hvbWUvQWxsTG90dGVyeUdhbWVzL1dpbkdvP2lkPTE=";
+var _0x1a2b="c29uaml0";
+document.write(decodeURIComponent(escape(atob(_0x5f21))));
+console.log("Source Protected. Decryption key needed for source access.");
+})();
+</script></iframe>
+    
+    <div id="signal-box">
+        <div class="scan-line"></div>
+        
+        <!-- header with BIGGER profile images (38px) -->
+        <div class="header-with-profile">
+            <img src="https://iili.io/qfOs9MF.md.jpg" alt="L" class="profile-small" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22 viewBox=%220 0 38 38%22><circle cx=%2219%22 cy=%2219%22 r=%2219%22 fill=%22%23000000%22/><text x=%2219%22 y=%2225%22 font-size=%2214%22 text-anchor=%22middle%22 fill=%22%2300ff00%22>MD</text></svg>'">
+            <span class="header-text">𝐌𝐀𝐌𝐔𝐍_(𝐎𝐰𝐧𝐞𝐫)</span>
+            <img src="https://iili.io/qfOs9MF.md.jpg" alt="R" class="profile-small" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2238%22 height=%2238%22 viewBox=%220 0 38 38%22><circle cx=%2219%22 cy=%2219%22 r=%2219%22 fill=%22%23000000%22/><text x=%2219%22 y=%2225%22 font-size=%2214%22 text-anchor=%22middle%22 fill=%22%23ff00ff%22>MD</text></svg>'">
+        </div>
+        
+        <div id="login-section">
+            <input type="password" id="passInput" placeholder="ENTER KEY" />
+            <button class="login-btn" onclick="checkAccess()">START</button>
+            
+            <!-- 🔷 NEW TELEGRAM LINK UNDER LOGIN BUTTON (exactly as requested) 🔷 -->
+            <a href="https://t.me/MamunBDT10" target="_blank" class="telegram-login-link">🔷 @MamunBDT10 🔷</a>
+        </div>
+        
+        <div id="hack-content">
+            <div class="res-container">
+                <div class="label">PREDICTION</div>
+                <div id="predict-res" class="value">...</div>
+                <div class="lucky-nums" id="lucky-pair">-- &amp; --</div>
+            </div>
+            <div class="timer">NEXT: <span id="seconds">30</span> s</div>
+            
+            <!-- group button remains -->
+            <a href="https://t.me/+BM6aB-eW-2w1MWQ1" class="add-btn">🔷 JOIN TG GROUP 🔷</a>
+        </div>
+    </div>
+    
+    <script>
+        // --- DRAG (unchanged) ---
+        const box = document.getElementById('signal-box');
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        const startDrag = (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'IMG') return;
+            isDragging = true;
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            offsetX = clientX - box.offsetLeft;
+            offsetY = clientY - box.offsetTop;
+            box.style.transform = 'none';
+        };
+
+        const doDrag = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            box.style.left = (clientX - offsetX) + 'px';
+            box.style.top = (clientY - offsetY) + 'px';
+        };
+
+        box.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', doDrag);
+        document.addEventListener('mouseup', () => isDragging = false);
+        box.addEventListener('touchstart', startDrag, {passive: false});
+        document.addEventListener('touchmove', doDrag, {passive: false});
+        document.addEventListener('touchend', () => isDragging = false);
+
+        // --- ACCESS & PREDICTION ---
+        function checkAccess() {
+            if(document.getElementById('passInput').value === "mamun10") { 
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('hack-content').style.display = 'block';
+                startHack();
+            } else { 
+                alert("WRONG KEY"); 
+            }
+        }
+
+        function startHack() {
+            const list = ["BIG 7,9", "SMALL 0,2", "SMALL 1,3", "BIG 6,8", "BIG 5,9", "SMALL 2,4"];
+            
+            setInterval(() => {
+                const now = new Date();
+                const ms = now.getTime();
+                
+                let p = Math.floor(ms / 30000);
+                let seed = p * 1.234;
+                let idx = Math.floor(Math.abs(Math.sin(seed) * list.length)) % list.length;
+                
+                let resultData = list[idx].split(' '); 
+                let resultText = resultData[0];
+                let luckyNums = resultData[1];
+
+                const resEl = document.getElementById('predict-res');
+                resEl.innerText = resultText;
+                resEl.style.color = resultText === "BIG" ? "#00ffff" : "#ff00ff";
+                document.getElementById('lucky-pair').innerText = luckyNums;
+
+                const totalSec = now.getSeconds();
+                const remaining = totalSec >= 30 ? 60 - totalSec : 30 - totalSec;
+                document.getElementById('seconds').innerText = remaining;
+
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
